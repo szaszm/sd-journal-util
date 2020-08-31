@@ -6,18 +6,23 @@
 #include <optional>
 #include <utility>
 #include <string_view>
+#include <memory>
 
 namespace {
 using namespace std::literals;
 
-sd_journal* open_journal(const int flags = SD_JOURNAL_LOCAL_ONLY) {
+struct journal_deleter {
+	void operator()(sd_journal* const p) const noexcept { sd_journal_close(p); }
+};
+
+auto open_journal(const int flags = SD_JOURNAL_LOCAL_ONLY) {
 	sd_journal* ret = nullptr;
 	const auto errc = sd_journal_open(&ret, flags);
 	if (errc < 0) {
 		throw std::system_error{ -errc, std::generic_category() };
 	}
 	assert(ret);
-	return ret;
+	return std::unique_ptr<sd_journal, journal_deleter>{ret};
 }
 
 struct journal_field {
@@ -44,14 +49,13 @@ std::optional<journal_field> get_next_field(sd_journal* const journal) {
 } // namespace <anonymous>
 
 int main() {
-	sd_journal* const journal = open_journal();
+	const auto journal = open_journal();
 	
-	SD_JOURNAL_FOREACH(journal) {
+	SD_JOURNAL_FOREACH(journal.get()) {
 		std::optional<journal_field> field;
-		while((field = get_next_field(journal)).has_value()) {
+		while((field = get_next_field(journal.get())).has_value()) {
 			fmt::print("{:10}: {}\n", field->name, field->value);
 		}
 		fmt::print("========\n");
 	}
-	sd_journal_close(journal);
 }

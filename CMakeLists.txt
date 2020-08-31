@@ -22,3 +22,4 @@ target_compile_options(sd_journal_cat PRIVATE
 		-Wcomma -Wctad-maybe-unsupported -Wdeprecated -Wduplicate-enum -Wfor-loop-analysis -Wformat-type-confusion
 		-Wfour-char-constants -Wframe-address -Wgnu -Wheader-hygiene -Widiomatic-parentheses -Wint-in-bool-context
 		-Wmicrosoft -Wmost>)
+set_property(TARGET sd_journal_cat PROPERTY CXX_EXTENSIONS OFF)
