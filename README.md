@@ -1,12 +1,13 @@
 # sd-journal-util
 
+Make sure fmt is installed.
+
 	$ git clone git@github.com:szaszm/sd-journal-util.git
 	$ cd sd-journal-util/
 	$ mkdir build
 	$ cd build
-	$ conan install ..
-	$ cmake -G Ninja ..
-	$ ninja -v
+	$ cmake ..
+	$ cmake --build .
 	$ bin/sd_journal_cat
 	
 # Licensing
